@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserList from './components/UserList';
+import UserList from './components/userList';
 import UserForm from './components/UserForm';
 import { userApi } from './services/api';
 import './App.css';
