@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { USER_FIELDS } from '../config/fields';
+import React, { useState, useEffect, useCallback } from "react";
+import { USER_FIELDS } from "../config/fields";
 
 const UserForm = ({ user, onSubmit, onCancel, loading }) => {
   const [formData, setFormData] = useState({});
@@ -16,8 +16,10 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
   }, [user]);
 
   const validateField = useCallback((field, value) => {
-    const fieldConfig = USER_FIELDS.find(f => f.key === field);
+    const fieldConfig = USER_FIELDS.find((f) => f.key === field);
     const error = {};
+
+    if (!fieldConfig) return error;
 
     if (fieldConfig.required && !value?.trim()) {
       error[field] = `${fieldConfig.label} is required`;
@@ -26,15 +28,17 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
 
     if (fieldConfig.validation) {
       const { minLength, maxLength, pattern } = fieldConfig.validation;
-      
+
       if (minLength && value.length < minLength) {
-        error[field] = `${fieldConfig.label} must be at least ${minLength} characters`;
+        error[field] =
+          `${fieldConfig.label} must be at least ${minLength} characters`;
       }
-      
+
       if (maxLength && value.length > maxLength) {
-        error[field] = `${fieldConfig.label} must not exceed ${maxLength} characters`;
+        error[field] =
+          `${fieldConfig.label} must not exceed ${maxLength} characters`;
       }
-      
+
       if (pattern && !pattern.test(value)) {
         error[field] = `${fieldConfig.label} format is invalid`;
       }
@@ -45,11 +49,11 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error on change
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -58,7 +62,7 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
     const newErrors = {};
 
     // Validate all fields
-    USER_FIELDS.forEach(field => {
+    USER_FIELDS.forEach((field) => {
       const fieldError = validateField(field.key, formData[field.key]);
       Object.assign(newErrors, fieldError);
     });
@@ -73,17 +77,18 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="row g-3">
-      {USER_FIELDS.map(field => (
+      {USER_FIELDS.map((field) => (
         <div key={field.key} className="col-md-6">
           <label className="form-label">
-            {field.label} {field.required && <span className="text-danger">*</span>}
+            {field.label}{" "}
+            {field.required && <span className="text-danger">*</span>}
           </label>
           <input
             type={field.type}
-            className={`form-control ${errors[field.key] ? 'is-invalid' : ''}`}
+            className={`form-control ${errors[field.key] ? "is-invalid" : ""}`}
             name={field.key}
             placeholder={field.placeholder}
-            value={formData[field.key] || ''}
+            value={formData[field.key] || ""}
             onChange={handleChange}
             disabled={loading}
             required={field.required}
@@ -93,19 +98,15 @@ const UserForm = ({ user, onSubmit, onCancel, loading }) => {
           )}
         </div>
       ))}
-      
+
       <div className="col-12">
         <div className="d-flex gap-2">
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={loading}
-          >
-            {loading ? 'Saving...' : (user ? 'Update User' : 'Create User')}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Saving..." : user ? "Update User" : "Create User"}
           </button>
           {onCancel && (
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-secondary"
               onClick={onCancel}
               disabled={loading}
