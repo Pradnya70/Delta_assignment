@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserList from './components/userList';
-import UserForm from './components/UserForm';
+import UserForm from './components/userForm';
 import { userApi } from './services/api';
 import './App.css';
 
