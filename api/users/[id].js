@@ -1,4 +1,4 @@
-import usersData from "../data-store.js";
+import { loadUsers, saveUsers } from "../data-store.js";
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,6 +15,7 @@ export default function handler(req, res) {
 
   try {
     const id = req.query.id;
+    const usersData = loadUsers();
 
     if (req.method === "GET") {
       const user = usersData.find((u) => u._id === id);
@@ -27,6 +28,7 @@ export default function handler(req, res) {
       const index = usersData.findIndex((u) => u._id === id);
       if (index > -1) {
         usersData[index] = { ...usersData[index], ...req.body };
+        saveUsers(usersData);
         res.json(usersData[index]);
       } else {
         res.status(404).json({ error: "User not found" });
@@ -35,6 +37,7 @@ export default function handler(req, res) {
       const index = usersData.findIndex((u) => u._id === id);
       if (index > -1) {
         usersData.splice(index, 1);
+        saveUsers(usersData);
         res.json({ success: true });
       } else {
         res.status(404).json({ error: "User not found" });

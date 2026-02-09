@@ -1,4 +1,4 @@
-import usersData from "./data-store.js";
+import { loadUsers, saveUsers } from "./data-store.js";
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -12,14 +12,17 @@ export default function handler(req, res) {
 
   try {
     if (req.method === "GET") {
+      const usersData = loadUsers();
       res.json(usersData);
     } else if (req.method === "POST") {
+      const usersData = loadUsers();
       const user = {
         _id: Date.now().toString(),
         ...req.body,
         createdAt: new Date().toISOString(),
       };
       usersData.push(user);
+      saveUsers(usersData);
       res.status(201).json(user);
     } else {
       res.status(405).json({ error: "Method not allowed" });
