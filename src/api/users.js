@@ -1,6 +1,15 @@
 let users = [];
 
-module.exports = (req, res) => {
+export default function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'GET') {
     res.json(users);
   } else if (req.method === 'POST') {
@@ -21,4 +30,4 @@ module.exports = (req, res) => {
     users = users.filter(u => u.id !== id);
     res.json({ success: true });
   }
-};
+}
