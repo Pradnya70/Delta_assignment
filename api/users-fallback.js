@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
+    "GET, POST, PUT, DELETE, OPTIONS",
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -16,25 +16,10 @@ export default async function handler(req, res) {
   try {
     const mongoUri = process.env.MONGODB_URI;
 
-    // If MongoDB is configured, use it
-    if (mongoUri) {
-      console.log("Using MongoDB");
-      const { connectDB, User } = await import("./db.js");
-      await connectDB();
-
-      if (req.method === "GET") {
-        const users = await User.find({});
-        res.json(users);
-      } else if (req.method === "POST") {
-        const user = new User(req.body);
-        const savedUser = await user.save();
-        res.status(201).json(savedUser);
-      } else {
-        res.status(405).json({ error: "Method not allowed" });
-      }
-    } else {
-      // Fallback to in-memory storage
-      console.warn("MONGODB_URI not configured - using in-memory storage");
+    if (!mongoUri) {
+      console.warn(
+        "MONGODB_URI not set - using in-memory storage (data will be lost on redeploy)",
+      );
 
       if (req.method === "GET") {
         res.json(usersData);
@@ -49,13 +34,29 @@ export default async function handler(req, res) {
       } else {
         res.status(405).json({ error: "Method not allowed" });
       }
+      return;
+    }
+
+    // Try to use MongoDB
+    const { connectDB, User } = await import("./db.js");
+    await connectDB();
+
+    if (req.method === "GET") {
+      const users = await User.find({});
+      res.json(users);
+    } else if (req.method === "POST") {
+      const user = new User(req.body);
+      const savedUser = await user.save();
+      res.status(201).json(savedUser);
+    } else {
+      res.status(405).json({ error: "Method not allowed" });
     }
   } catch (error) {
     console.error("API Error:", error.message);
     res.status(500).json({
-      error: error.message || "Internal Server Error",
-      hint: "Check Vercel logs for details. If using fallback storage, data won't persist.",
+      error: error.message,
+      warning:
+        "If using in-memory storage, data will be lost on redeployment. Add MONGODB_URI to Vercel environment variables.",
     });
   }
-}
 }
