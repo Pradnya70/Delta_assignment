@@ -38,7 +38,7 @@ const UserList = ({ users, loading, onEdit, onDelete }) => {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id}>
+<tr key={user._id}>
                     <td>
                       <strong>{user.firstName} {user.lastName}</strong>
                     </td>
@@ -55,7 +55,7 @@ const UserList = ({ users, loading, onEdit, onDelete }) => {
     </button>
     <button 
       className="btn btn-outline-danger"
-      onClick={() => onDelete(user.id)}
+onClick={() => onDelete(user._id)}
       title="Delete User"
     >
       🗑️ Delete
