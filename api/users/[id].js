@@ -14,7 +14,20 @@ export default function handler(req, res) {
   }
 
   try {
-    const id = req.query.id;
+    let id = req.query.id;
+
+    // Fallback: extract ID from URL path if query fails
+    if (!id && req.url) {
+      const match = req.url.match(/\/api\/users\/([^/?]+)/);
+      if (match) {
+        id = match[1];
+      }
+    }
+
+    // If still no ID, return error
+    if (!id || id === "undefined") {
+      return res.status(400).json({ error: "User ID is required" });
+    }
 
     if (req.method === "GET") {
       const users = getUsers();
