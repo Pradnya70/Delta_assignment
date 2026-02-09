@@ -49,7 +49,7 @@ function App() {
     try {
       setLoading(true);
       setError('');
-      await userApi.update(selectedUser.id, formData);
+await userApi.update(selectedUser._id, formData);
       setShowForm(false);
       setSelectedUser(null);
       fetchUsers();
