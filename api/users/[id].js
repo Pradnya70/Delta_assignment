@@ -1,4 +1,4 @@
-import { loadUsers, saveUsers } from "../data-store.js";
+import { getUsers, updateUser, deleteUser } from "../data-store.js";
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,29 +15,25 @@ export default function handler(req, res) {
 
   try {
     const id = req.query.id;
-    const usersData = loadUsers();
 
     if (req.method === "GET") {
-      const user = usersData.find((u) => u._id === id);
+      const users = getUsers();
+      const user = users.find((u) => u._id === id);
       if (user) {
         res.json(user);
       } else {
         res.status(404).json({ error: "User not found" });
       }
     } else if (req.method === "PUT") {
-      const index = usersData.findIndex((u) => u._id === id);
-      if (index > -1) {
-        usersData[index] = { ...usersData[index], ...req.body };
-        saveUsers(usersData);
-        res.json(usersData[index]);
+      const user = updateUser(id, req.body);
+      if (user) {
+        res.json(user);
       } else {
         res.status(404).json({ error: "User not found" });
       }
     } else if (req.method === "DELETE") {
-      const index = usersData.findIndex((u) => u._id === id);
-      if (index > -1) {
-        usersData.splice(index, 1);
-        saveUsers(usersData);
+      const deleted = deleteUser(id);
+      if (deleted) {
         res.json({ success: true });
       } else {
         res.status(404).json({ error: "User not found" });
@@ -47,6 +43,6 @@ export default function handler(req, res) {
     }
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }

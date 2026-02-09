@@ -1,27 +1,34 @@
-import fs from "fs";
-import path from "path";
+// Global in-memory data store for Vercel serverless
+// Note: Data persists during warm invocations but resets on cold starts
+let usersStore = [];
 
-// Use /tmp directory on Vercel (writable storage)
-const dataFile = path.join("/tmp", "users.json");
-
-function loadUsers() {
-  try {
-    if (fs.existsSync(dataFile)) {
-      const data = fs.readFileSync(dataFile, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error loading users:", error);
-  }
-  return [];
+export function getUsers() {
+  return usersStore;
 }
 
-function saveUsers(users) {
-  try {
-    fs.writeFileSync(dataFile, JSON.stringify(users, null, 2), "utf-8");
-  } catch (error) {
-    console.error("Error saving users:", error);
-  }
+export function setUsers(users) {
+  usersStore = users;
 }
 
-export { loadUsers, saveUsers };
+export function addUser(user) {
+  usersStore.push(user);
+  return user;
+}
+
+export function updateUser(id, updates) {
+  const index = usersStore.findIndex((u) => u._id === id);
+  if (index > -1) {
+    usersStore[index] = { ...usersStore[index], ...updates };
+    return usersStore[index];
+  }
+  return null;
+}
+
+export function deleteUser(id) {
+  const index = usersStore.findIndex((u) => u._id === id);
+  if (index > -1) {
+    usersStore.splice(index, 1);
+    return true;
+  }
+  return false;
+}
