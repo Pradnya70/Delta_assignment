@@ -10,13 +10,24 @@ const userSchema = new mongoose.Schema({
 
 export const User = mongoose.model("User", userSchema);
 
+let isConnected = false;
+
 export async function connectDB() {
-  if (mongoose.connection.readyState !== 0) return;
+  if (isConnected) {
+    return;
+  }
 
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      throw new Error("MONGODB_URI environment variable is not set");
+    }
+
+    await mongoose.connect(mongoUri);
+    isConnected = true;
+    console.log("MongoDB connected successfully");
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.error("MongoDB connection error:", error.message);
     throw error;
   }
 }
