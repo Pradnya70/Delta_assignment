@@ -15,8 +15,15 @@ function App() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await userApi.getAll();
-      setUsers(data);
+     const data = await userApi.getAll();
+
+const normalized = data.map((user) => ({
+  ...user,
+  id: user._id,
+}));
+
+setUsers(normalized);
+
     } catch (err) {
       setError('Failed to fetch users');
     } finally {
@@ -43,22 +50,23 @@ function App() {
     }
   };
 
-  const handleUpdate = async (formData) => {
-    if (!selectedUser) return;
-    
-    try {
-      setLoading(true);
-      setError('');
-await userApi.update(selectedUser._id, formData);
-      setShowForm(false);
-      setSelectedUser(null);
-      fetchUsers();
-    } catch (err) {
-      setError('Failed to update user');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleUpdate = async (formData) => {
+  if (!selectedUser) return;
+  
+  try {
+    setLoading(true);
+    setError('');
+    await userApi.update(selectedUser.id, formData);
+    setShowForm(false);
+    setSelectedUser(null);
+    fetchUsers();
+  } catch (err) {
+    setError('Failed to update user');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
