@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  firstName: String,
-  lastName: String,
-  phone: String,
-  email: String,
-});
+const userSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String, required: true },
+  },
+  { timestamps: true },
+);
 
 export const User = mongoose.model("User", userSchema);
 
@@ -23,11 +25,17 @@ export async function connectDB() {
       throw new Error("MONGODB_URI environment variable is not set");
     }
 
-    await mongoose.connect(mongoUri);
+    const options = {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    };
+
+    await mongoose.connect(mongoUri, options);
     isConnected = true;
     console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection error:", error.message);
+    isConnected = false;
     throw error;
   }
 }

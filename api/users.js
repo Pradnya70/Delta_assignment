@@ -17,20 +17,17 @@ export default async function handler(req, res) {
     await connectDB();
 
     if (req.method === "GET") {
-      const users = await User.find();
+      const users = await User.find({});
       res.json(users);
     } else if (req.method === "POST") {
-      const user = new User({
-        _id: new Date().getTime(),
-        ...req.body,
-      });
+      const user = new User(req.body);
       await user.save();
       res.status(201).json(user);
     } else {
       res.status(405).json({ error: "Method not allowed" });
     }
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("API Error:", error);
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }

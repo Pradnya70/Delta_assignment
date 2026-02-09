@@ -32,13 +32,17 @@ export default async function handler(req, res) {
         res.status(404).json({ error: "User not found" });
       }
     } else if (req.method === "DELETE") {
-      await User.findByIdAndDelete(id);
-      res.json({ success: true });
+      const result = await User.findByIdAndDelete(id);
+      if (result) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
     } else {
       res.status(405).json({ error: "Method not allowed" });
     }
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("API Error:", error);
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }
