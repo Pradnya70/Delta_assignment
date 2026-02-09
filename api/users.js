@@ -1,4 +1,4 @@
-let users = [];
+const { users } = require("./data");
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -19,18 +19,7 @@ export default function handler(req, res) {
     const user = { id: Date.now(), ...req.body };
     users.push(user);
     res.status(201).json(user);
-  } else if (req.method === "PUT") {
-    const id = +req.query.id;
-    const index = users.findIndex((u) => u.id === id);
-    if (index > -1) {
-      users[index] = { ...users[index], ...req.body };
-      res.json(users[index]);
-    } else {
-      res.status(404).json({ error: "Not found" });
-    }
-  } else if (req.method === "DELETE") {
-    const id = +req.query.id;
-    users = users.filter((u) => u.id !== id);
-    res.json({ success: true });
+  } else {
+    res.status(405).json({ error: "Method not allowed" });
   }
 }
