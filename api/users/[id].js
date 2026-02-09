@@ -1,6 +1,6 @@
-import { users } from "../data.js";
+import { connectDB, User } from "../db.js";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -13,32 +13,32 @@ export default function handler(req, res) {
     return;
   }
 
-  const id = +req.query.id;
+  try {
+    await connectDB();
+    const id = req.query.id;
 
-  if (req.method === "PUT") {
-    const index = users.findIndex((u) => u.id === id);
-    if (index > -1) {
-      users[index] = { ...users[index], ...req.body };
-      res.json(users[index]);
-    } else {
-      res.status(404).json({ error: "User not found" });
-    }
-  } else if (req.method === "DELETE") {
-    const index = users.findIndex((u) => u.id === id);
-    if (index > -1) {
-      users.splice(index, 1);
+    if (req.method === "GET") {
+      const user = await User.findById(id);
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } else if (req.method === "PUT") {
+      const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } else if (req.method === "DELETE") {
+      await User.findByIdAndDelete(id);
       res.json({ success: true });
     } else {
-      res.status(404).json({ error: "User not found" });
+      res.status(405).json({ error: "Method not allowed" });
     }
-  } else if (req.method === "GET") {
-    const user = users.find((u) => u.id === id);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
-    }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
