@@ -1,4 +1,2 @@
 // Shared data store
-let users = [];
-
-module.exports = { users };
+export let users = [];

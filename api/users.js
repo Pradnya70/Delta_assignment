@@ -1,4 +1,4 @@
-const { users } = require("./data");
+import { users } from "./data.js";
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

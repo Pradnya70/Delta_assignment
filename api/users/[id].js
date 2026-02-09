@@ -1,6 +1,6 @@
-const { users } = require("../data");
+import { users } from "../data.js";
 
-module.exports = function handler(req, res) {
+export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -41,4 +41,4 @@ module.exports = function handler(req, res) {
   } else {
     res.status(405).json({ error: "Method not allowed" });
   }
-};
+}
